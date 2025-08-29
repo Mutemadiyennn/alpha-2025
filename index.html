@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DDoSTECH - System Maintenance</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #e0e0e0;
+            font-family: 'Fira Code', monospace;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .background-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 0, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 0, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: 1;
+        }
+
+        .terminal-container {
+            position: relative;
+            z-index: 2;
+            width: 90%;
+            max-width: 900px;
+            background: rgba(15, 15, 15, 0.95);
+            border: 1px solid #333;
+            border-radius: 4px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .terminal-header {
+            background: #1a1a1a;
+            color: #888;
+            padding: 12px 20px;
+            border-bottom: 1px solid #333;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .terminal-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            font-family: 'Fira Code', monospace;
+            font-weight: 700;
+            font-size: 18px;
+            letter-spacing: -0.5px;
+        }
+
+        .logo .ddos {
+            color: #e0e0e0;
+        }
+
+        .logo .tech {
+            color: #4a9eff;
+        }
+
+        .terminal-info {
+            font-family: 'Fira Code', monospace;
+            color: #666;
+            font-size: 11px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #ff6b6b;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .terminal-body {
+            padding: 30px;
+            font-size: 14px;
+            line-height: 1.8;
+            min-height: 400px;
+        }
+
+        .terminal-line {
+            margin: 4px 0;
+            min-height: 22px;
+        }
+
+        .prompt {
+            color: #4a9eff;
+            font-weight: 500;
+        }
+
+        .command {
+            color: #fff;
+        }
+
+        .output {
+            color: #b8b8b8;
+        }
+
+        .output.success {
+            color: #51cf66;
+        }
+
+        .output.warning {
+            color: #ffd43b;
+        }
+
+        .output.error {
+            color: #ff6b6b;
+        }
+
+        .output.info {
+            color: #74c0fc;
+        }
+
+        .section-title {
+            color: #fff;
+            font-weight: 500;
+            text-decoration: underline;
+            margin: 8px 0;
+        }
+
+        .cursor {
+            display: inline-block;
+            background: #4a9eff;
+            width: 2px;
+            height: 16px;
+            animation: blink 1.2s infinite;
+            margin-left: 2px;
+        }
+
+        .progress-bar {
+            background: #333;
+            height: 20px;
+            width: 300px;
+            border: 1px solid #555;
+            margin: 8px 0;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .progress-fill {
+            background: #51cf66;
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #666;
+            font-size: 12px;
+            z-index: 2;
+        }
+
+        a {
+            color: #4a9eff;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        a:hover {
+            color: #74c0fc;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @media (max-width: 768px) {
+            .terminal-container {
+                width: 95%;
+                margin: 20px;
+            }
+            
+            .terminal-body {
+                padding: 20px;
+                font-size: 13px;
+            }
+            
+            .progress-bar {
+                width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-grid"></div>
+    
+    <div class="terminal-container">
+        <div class="terminal-header">
+            <div class="terminal-title">
+                <div class="status-dot"></div>
+                <div class="logo">
+                    <span class="ddos">DDOS</span><span class="tech">TECH</span>
+                </div>
+                <span class="terminal-info">terminal@ddostech.com</span>
+            </div>
+            <div>Maintenance Mode</div>
+        </div>
+        
+        <div class="terminal-body" id="terminal">
+            <!-- Lines will be added dynamically -->
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="logo" style="font-size: 14px; margin-bottom: 4px;">
+            <span class="ddos">DDOS</span><span class="tech">TECH</span>
+        </div>
+        <div style="color: #666; font-size: 11px;">© 2025 - Enterprise DDoS Protection Solutions</div>
+    </div>
+
+    <script>
+        const terminal = document.getElementById('terminal');
+
+        const lines = [
+            {
+                type: 'command',
+                prompt: 'terminal@ddostech.com:~$',
+                command: 'dnf install ddostech-script antiddos performance-servers -y',
+                delay: 1000
+            },
+            {
+                type: 'progress',
+                delay: 2000,
+                stopAt: 76
+            },
+            {
+                type: 'output',
+                text: 'DDoSTECH packages could not be installed for now!',
+                class: 'error',
+                delay: 500
+            },
+            {
+                type: 'empty',
+                delay: 800
+            },
+            {
+                type: 'command',
+                prompt: 'terminal@ddostech.com:~$',
+                command: 'cd maintenance',
+                delay: 1200
+            },
+            {
+                type: 'command',
+                prompt: 'terminal@ddostech.com:~/maintenance$',
+                command: 'cat system_status.md',
+                delay: 1000
+            },
+            {
+                type: 'empty',
+                delay: 500
+            },
+            {
+                type: 'output',
+                text: 'System Under Maintenance',
+                class: 'section-title',
+                delay: 800
+            },
+            {
+                type: 'output',
+                text: 'Our infrastructure is currently undergoing scheduled maintenance to enhance performance and security capabilities. We are committed to delivering enterprise-grade DDoS protection services.',
+                class: 'output',
+                delay: 1000
+            },
+            {
+                type: 'empty',
+                delay: 800
+            },
+            {
+                type: 'output',
+                text: 'Enterprise DDoS Protection Solutions',
+                class: 'success',
+                delay: 1000
+            },
+            {
+                type: 'output',
+                text: 'Advanced threat mitigation for gaming platforms, VPN services, and critical business infrastructure. DDoSTECH will be operational shortly with enhanced security protocols.',
+                class: 'output',
+                delay: 1200
+            },
+            {
+                type: 'empty',
+                delay: 800
+            },
+            {
+                type: 'command',
+                prompt: 'terminal@ddostech.com:~/maintenance$',
+                command: 'cat contact_information.md',
+                delay: 1000
+            },
+            {
+                type: 'empty',
+                delay: 500
+            },
+            {
+                type: 'output',
+                text: 'Technical Support: support@ddostech.com',
+                class: 'info',
+                delay: 1000
+            },
+            {
+                type: 'empty',
+                delay: 800
+            },
+            {
+                type: 'command',
+                prompt: 'terminal@ddostech.com:~/maintenance$',
+                command: '',
+                showCursor: true,
+                delay: 500
+            }
+        ];
+
+        function createLine() {
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+            terminal.appendChild(line);
+            return line;
+        }
+
+        function typeText(element, text, speed = 30) {
+            return new Promise(resolve => {
+                let i = 0;
+                const timer = setInterval(() => {
+                    if (i < text.length) {
+                        element.innerHTML += text.charAt(i);
+                        i++;
+                    } else {
+                        clearInterval(timer);
+                        resolve();
+                    }
+                }, speed);
+            });
+        }
+
+        function createProgressBar(stopAt = 100) {
+            const line = createLine();
+            const progressContainer = document.createElement('div');
+            progressContainer.innerHTML = '<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div> <span id="percentage">0%</span>';
+            line.appendChild(progressContainer);
+            
+            return new Promise(resolve => {
+                const fill = document.getElementById('progressFill');
+                const percentage = document.getElementById('percentage');
+                let progress = 0;
+                
+                const timer = setInterval(() => {
+                    progress += Math.random() * 8 + 2;
+                    if (progress > stopAt) progress = stopAt;
+                    
+                    // Change color based on progress
+                    if (progress >= 75) {
+                        fill.style.background = '#51cf66'; // Green
+                    } else if (progress >= 50) {
+                        fill.style.background = '#74c0fc'; // Blue
+                    } else if (progress >= 25) {
+                        fill.style.background = '#ffd43b'; // Yellow
+                    } else {
+                        fill.style.background = '#ff6b6b'; // Red
+                    }
+                    
+                    fill.style.width = progress + '%';
+                    percentage.textContent = Math.floor(progress) + '%';
+                    
+                    if (progress >= stopAt) {
+                        clearInterval(timer);
+                        setTimeout(resolve, 800);
+                    }
+                }, 150);
+            });
+        }
+
+        async function processLines() {
+            for (const lineData of lines) {
+                await new Promise(resolve => setTimeout(resolve, lineData.delay));
+                
+                if (lineData.type === 'command') {
+                    const line = createLine();
+                    const prompt = document.createElement('span');
+                    prompt.className = 'prompt';
+                    prompt.textContent = lineData.prompt;
+                    line.appendChild(prompt);
+                    
+                    const command = document.createElement('span');
+                    command.className = 'command';
+                    line.appendChild(command);
+                    
+                    await typeText(command, ' ' + lineData.command);
+                    
+                    if (lineData.showCursor) {
+                        const cursor = document.createElement('span');
+                        cursor.className = 'cursor';
+                        line.appendChild(cursor);
+                    }
+                }
+                else if (lineData.type === 'progress') {
+                    await createProgressBar(lineData.stopAt || 100);
+                }
+                else if (lineData.type === 'output') {
+                    const line = createLine();
+                    line.className = 'terminal-line ' + lineData.class;
+                    await typeText(line, lineData.text, 20);
+                }
+                else if (lineData.type === 'empty') {
+                    createLine();
+                }
+                
+                terminal.scrollTop = terminal.scrollHeight;
+            }
+        }
+
+        // Start the terminal simulation
+        setTimeout(processLines, 1000);
+    </script>
+</body>
+</html>
